@@ -77,6 +77,10 @@ set ignorecase
 set smartcase
 set showmatch
 
+" Get tags file from .git dir. Trailing semilcolon
+" makes vim search up directory tree for .git dir
+set tags+=./.git/tags;
+
 " don't open annoying python function preview split
 set completeopt-=preview
 
