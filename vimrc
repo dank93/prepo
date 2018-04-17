@@ -28,6 +28,9 @@ call plug#end()
 set number
 set relativenumber
 
+" backspace over everything in insert mode
+set backspace=indent,eol,start
+
 " cursor line
 set cursorline
 set cursorcolumn
