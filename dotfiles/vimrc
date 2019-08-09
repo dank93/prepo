@@ -8,6 +8,7 @@ Plug 'https://github.com/altercation/vim-colors-solarized'
 Plug 'https://github.com/airblade/vim-gitgutter'
 Plug 'https://github.com/tpope/vim-commentary'
 Plug 'https://github.com/Valloric/YouCompleteMe'
+" Plug 'https://github.com/zxqfl/tabnine-vim'
 Plug 'https://github.com/vim-airline/vim-airline'
 Plug 'https://github.com/vim-airline/vim-airline-themes'
 Plug 'https://github.com/tpope/vim-fugitive'
@@ -16,10 +17,10 @@ Plug 'https://github.com/kristijanhusak/vim-hybrid-material'
 Plug 'https://github.com/hzchirs/vim-material'
 Plug 'https://github.com/joshdick/onedark.vim'
 Plug 'https://github.com/KeitaNakamura/neodark.vim'
+Plug 'https://github.com/mhinz/vim-janah'
 Plug 'https://github.com/sheerun/vim-polyglot'
-Plug 'https://github.com/yuttie/comfortable-motion.vim'
-Plug '~/.fzf'
-Plug 'junegunn/fzf.vim'
+Plug 'https://github.com/christoomey/vim-tmux-navigator'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 
 " List ends here. Plugins become visible to Vim after this call.
 call plug#end()
@@ -36,21 +37,16 @@ set cursorline
 set cursorcolumn
 
 " Theme stuff 
-if (empty($TMUX))
-    if (has("termguicolors"))
-        set termguicolors
-        let g:enable_bold_font=1
-        let g:enable_italic_font=1
-        let g:palenight_terminal_italics=1
-        let g:solarized_visibility = "high"
-        let g:solarized_contrast = "high"
-        let g:onedark_terminal_italics=1
-        set background=dark
-        colorscheme neodark
-        let g:airline_theme='neodark'
-        let g:airline#extensions#tabline#enabled = 1
-    endif
-endif
+" Following 2 lines get Truecolor working in tmux
+let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+set termguicolors
+let g:enable_bold_font=1
+let g:enable_italic_font=1
+set background=dark
+colorscheme janah
+let g:airline_theme='neodark'
+let g:airline#extensions#tabline#enabled = 1
 
 " syntax highlighting
 syntax enable
@@ -81,6 +77,9 @@ set ignorecase
 set smartcase
 set showmatch
 
+" don't open annoying python function preview split
+set completeopt-=preview
+
 " gitgutter custom symbols
 let g:gitgutter_sign_added = '|'
 let g:gitgutter_sign_modified = '|'
@@ -90,29 +89,53 @@ let g:gitgutter_sign_removed = '|'
 autocmd FileType c,cpp,java setlocal commentstring=//\ %s
 autocmd FileType m setlocal commentstring=%\ %s
 
-" ctags path
-set tags=~/.tags;
-
 " Disable semantic autocompletion in YouCompleteMe
 let g:ycm_filetype_specific_completion_to_disable = {
       \ 'cpp': 1,
       \ 'c': 1}
 
-" enable fzf
-set rtp+=/usr/local/opt/fzf
-
 " Faster buffer cycling
-map <C-J> :bprevious<CR>
-map <C-K> :bnext<CR>
+map <C-N> :bprevious<CR>
+map <C-M> :bnext<CR>
+
+" Yank to system clipboard (works on mac)
+set clipboard=unnamed
+
+" Open ctags definitions in new tab or vsplit
+map <C-\> :tab split<CR>:exec("tag ".expand("<cword>"))<CR>
 
 " Search highlighted selection
 vnoremap // y/<C-R>"<CR>
 
+" Send visual selection to ipytho fifo buffer for execution
+vnoremap <c-x> :'<,'>w >> /tmp/ipython_fifo <CR>
+
+" In normal mode, highlight block betwee ## characters, so you
+" can tap ctrl-x twice and run a code block
+nnoremap <c-x> ?##<CR>jv/##<CR>k
+
 " Close buffer and switch to prev, keeping window open
 command CB bp|bd #
 
-" Turn off truecolor
-command TG set termguicolors!
+" Open fuzzy finder search at root of current git project
+command OG execute 'FZF' system('git rev-parse --show-toplevel')[:-2]
 
-" Open ctags definitions in new tab or vsplit
-map <C-\> :tab split<CR>:exec("tag ".expand("<cword>"))<CR>
+" Function + command to switch between implementation and header in fuzzy
+" finder
+function CH_CMD()
+    let fname = expand('%:t:r') " Get filename without extension
+    let ext = expand('%:e') " Get filename extension
+
+    " Choose opposite extension
+    let new_ext = ""
+    if ext=="hpp"
+        let new_ext = ".cpp"
+    elseif ext==".cpp"
+        let new_ext = ".hpp"
+    endif
+        
+    " Create full command
+    let cmd_str = 'call fzf#run({"source": "git ls-files", "sink": "e", "down": "30%", "options": "--query='.fname.new_ext.'"})'
+    return cmd_str
+endfunction
+command CH execute CH_CMD()
