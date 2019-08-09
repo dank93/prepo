@@ -1,0 +1,110 @@
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
+
+
+########################## BASH HISTORY ##########################
+# don't put duplicate lines or lines starting with space in the history.
+# See bash(1) for more options
+HISTCONTROL=ignoreboth
+
+# append to the history file, don't overwrite it
+shopt -s histappend
+
+# Eternal bash history.
+# ---------------------
+# Undocumented feature which sets the size to "unlimited".
+# http://stackoverflow.com/questions/9457233/unlimited-bash-history
+export HISTFILESIZE=
+export HISTSIZE=
+export HISTTIMEFORMAT="[%F %T] "
+# Change the file location because certain bash sessions truncate .bash_history file upon close.
+# http://superuser.com/questions/575479/bash-history-truncated-to-500-lines-on-each-login
+export HISTFILE=~/.bash_eternal_history
+# Force prompt to write history after every command.
+# http://superuser.com/questions/20900/bash-history-loss
+PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
+##################################################################
+
+
+
+########################## COMMAND COMPLETION ##########################
+# Bash prefix history completion
+if [[ $- == *i* ]]
+then
+    bind '"\e[A": history-search-backward'
+    bind '"\e[B": history-search-forward'
+fi
+
+# Show matches and cycle through them with Tab
+bind TAB:complete
+# bind "set show-all-if-ambiguous off"
+# bind "set menu-complete-display-prefix on"
+
+# enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+if ! shopt -oq posix; then
+    if [ -f /usr/share/bash-completion/bash_completion ]; then
+        . /usr/share/bash-completion/bash_completion
+    elif [ -f /etc/bash_completion ]; then
+        . /etc/bash_completion
+    fi
+fi
+#######################################################################
+
+
+
+########################## WINDOW SIZE ##########################
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+#################################################################
+
+
+
+########################## LESS THING ##########################
+# make less more friendly for non-text input files, see lesspipe(1)
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+################################################################
+
+
+
+########################## PROMPT ##########################
+parse_git_branch() {
+ git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
+}
+PS1='\[\033[01;34m\]$(echo $(dirname \w)|sed -e "s;\(/.\)[^/]*;\1;g")/$(basename \w) \[\e[38;5;99m\]$(parse_git_branch)\[\e[38;5;27m\]>\[\e[38;5;38m\]>\[\e[38;5;87m\]>\[\e[0m\] '
+############################################################
+
+
+
+########################## USE VIM ##########################
+export VISUAL=vim
+export EDITOR="$VISUAL"
+#############################################################
+
+
+
+########################## FUNCTIONS ##########################
+function git_root_dir()
+{
+    git rev-parse --show-toplevel
+}
+###############################################################
+
+
+
+########################## ALIASES ##########################
+alias bashrcedit='vim ~/prepo/dotfiles/bashrc'
+alias gcb='git rev-parse --abbrev-ref HEAD'
+alias gitags='ctags -f $(git_root_dir)/.git/tags -R --exclude=@$(git_root_dir)/.gitignore $(git_root_dir)'
+alias gl='git log --oneline | head -20 | tac'
+alias tmux='env TERM=xterm-256color tmux'
+alias tmuxedit='vim ~/prepo/dotfiles/tmux.conf'
+alias vimrcedit='vim ~/prepo/dotfiles/vimrc'
+alias ls="ls -CFG"
+#############################################################
