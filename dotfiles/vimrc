@@ -108,7 +108,7 @@ map <C-\> :tab split<CR>:exec("tag ".expand("<cword>"))<CR>
 vnoremap // y/\V<C-R>"<CR>
 
 " Send visual selection to ipytho fifo buffer for execution
-vnoremap <c-x> :'<,'>w >> /tmp/ipython_fifo <CR>
+vnoremap <c-x> :'<,'>w! /tmp/cmd <CR> <bar> :silent execute '!python3 -m send2console -f /tmp/cmd &' <bar> :execute ':redraw!'<CR>
 
 " In normal mode, highlight block betwee ## characters, so you
 " can tap ctrl-x twice and run a code block
