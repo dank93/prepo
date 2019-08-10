@@ -58,6 +58,13 @@ fi
 
 
 
+########################## PATH UPDATES ##########################
+# Get jupyter working
+export PATH=$PATH:/Library/Frameworks/Python.framework/Versions/3.7/bin/
+##################################################################
+
+
+
 ########################## WINDOW SIZE ##########################
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
