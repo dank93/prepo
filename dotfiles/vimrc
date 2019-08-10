@@ -105,7 +105,7 @@ set clipboard=unnamed
 map <C-\> :tab split<CR>:exec("tag ".expand("<cword>"))<CR>
 
 " Search highlighted selection
-vnoremap // y/<C-R>"<CR>
+vnoremap // y/\V<C-R>"<CR>
 
 " Send visual selection to ipytho fifo buffer for execution
 vnoremap <c-x> :'<,'>w >> /tmp/ipython_fifo <CR>
