@@ -118,6 +118,8 @@ alias gitags='ctags -f $(git_root_dir)/.git/tags -R --exclude=@$(git_root_dir)/.
 alias gl='git log --oneline | head -20 | tac'
 alias tmux='env TERM=xterm-256color tmux'
 alias tmuxedit='vim ~/prepo/dotfiles/tmux.conf'
+alias vi='mvim -v'
+alias vim='mvim -v'
 alias vimrcedit='vim ~/prepo/dotfiles/vimrc'
 alias ls="ls -CFG"
 #############################################################
