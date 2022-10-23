@@ -53,6 +53,9 @@ let g:airline#extensions#tabline#enabled = 1
 syntax enable
 let g:cpp_member_variable_highlight = 1
 
+" Use cpp syntax highlighting for .metal files
+au BufRead,BufNewFile *.metal set filetype=cpp
+
 " Auto reload files
 set autoread
 
