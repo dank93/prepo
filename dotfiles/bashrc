@@ -132,4 +132,5 @@ alias tmux='env TERM=xterm-256color tmux'
 alias tmuxedit='vim ~/prepo/dotfiles/tmux.conf'
 alias vimrcedit='vim ~/prepo/dotfiles/vimrc'
 alias ls="ls -CFG"
+alias l="ls -CFG"
 #############################################################
